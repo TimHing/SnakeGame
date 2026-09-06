@@ -84,6 +84,7 @@ async function syncStudents(notion, studentsDbId) {
     const name = getTitle(page.properties.Name);
     const dbRaw = getUrlOrText(page.properties['Questions DB']);
     const questionsDbId = extractDatabaseId(dbRaw);
+    const pin = getRichText(page.properties.PIN);
 
     if (!name) fail('學生列缺少 Name（標題欄）', page);
     if (!questionsDbId) fail(`學生「${name}」的 Questions DB 欄位看不出有效的 Notion 資料庫網址/ID`, page);
@@ -91,7 +92,9 @@ async function syncStudents(notion, studentsDbId) {
     // 依序處理（不平行）：Notion API 有速率限制，學生數量預期很少，順序執行更穩妥。
     // eslint-disable-next-line no-await-in-loop
     const questions = await syncStudentQuestions(notion, questionsDbId, `學生「${name}」`);
-    students.push({ id: page.id, name, questions });
+    students.push({
+      id: page.id, name, pin: pin || null, questions,
+    });
   }
   return students;
 }

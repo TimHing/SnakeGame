@@ -8,22 +8,69 @@ export function showRollCallView() {
   loginView.classList.remove('hidden');
 }
 
-/** 免密碼點名登入：點自己的名字開始玩，每個人對應自己專屬的題庫 */
+/**
+ * 免密碼點名登入，可選加一個存在 Notion 的 PIN 碼：只是防誤觸的小提醒，
+ * PIN 本身會被打包進公開網站原始碼，不是真正的安全機制。
+ */
 export function bindRollCall({ onStart }) {
   const listEl = document.getElementById('rollcall-list');
   const emptyMsg = document.getElementById('rollcall-empty');
 
   listEl.innerHTML = '';
   students.forEach((student) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = student.name;
-    btn.addEventListener('click', () => {
+    const item = document.createElement('div');
+    item.className = 'rollcall-item';
+
+    const nameBtn = document.createElement('button');
+    nameBtn.type = 'button';
+    nameBtn.textContent = student.name;
+
+    const pinRow = document.createElement('div');
+    pinRow.className = 'rollcall-pin hidden';
+
+    const pinInput = document.createElement('input');
+    pinInput.type = 'password';
+    pinInput.inputMode = 'numeric';
+    pinInput.placeholder = 'PIN';
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.type = 'button';
+    confirmBtn.className = 'secondary';
+    confirmBtn.textContent = '確認';
+
+    const errorEl = document.createElement('p');
+    errorEl.className = 'error';
+
+    pinRow.append(pinInput, confirmBtn, errorEl);
+    item.append(nameBtn, pinRow);
+    listEl.appendChild(item);
+
+    const start = () => {
       loginView.classList.add('hidden');
       gameView.classList.remove('hidden');
       onStart({ id: student.id, name: student.name, questions: student.questions });
+    };
+
+    const attempt = () => {
+      if (pinInput.value === student.pin) {
+        start();
+      } else {
+        errorEl.textContent = 'PIN 不對，再試試看';
+        pinInput.value = '';
+        pinInput.focus();
+      }
+    };
+
+    nameBtn.addEventListener('click', () => {
+      if (!student.pin) {
+        start(); // 沒設 PIN 的學生直接進去
+        return;
+      }
+      pinRow.classList.remove('hidden');
+      pinInput.focus();
     });
-    listEl.appendChild(btn);
+    confirmBtn.addEventListener('click', attempt);
+    pinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') attempt(); });
   });
   emptyMsg.classList.toggle('hidden', students.length > 0);
 }

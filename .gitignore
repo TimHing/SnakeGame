@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+.claude/
+
+.env
+src/data/students.json
+src/data/questions.json

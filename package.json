@@ -1,0 +1,22 @@
+{
+  "name": "snakeg",
+  "version": "0.2.0",
+  "private": true,
+  "description": "教育版單人貪吃蛇 — 學習乘法口訣（資料存放在 Notion，靜態部署到 GitHub Pages）",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "sync:notion": "node scripts/sync-notion.mjs",
+    "seed:notion-questions": "node scripts/seed-notion-questions.mjs"
+  },
+  "dependencies": {
+    "phaser": "^3.80.0"
+  },
+  "devDependencies": {
+    "@notionhq/client": "^2.3.0",
+    "dotenv": "^16.4.5",
+    "vite": "^5.4.0"
+  }
+}

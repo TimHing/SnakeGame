@@ -1,0 +1,66 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans TC', sans-serif;
+  background: #1b1f2a;
+  color: #fff;
+}
+.hidden { display: none !important; }
+.muted { color: #9aa3b2; font-size: 0.9rem; }
+
+#login-view { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.login-box {
+  background: #262c3d; padding: 2.5rem; border-radius: 16px; width: 380px; text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+}
+.login-box h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
+
+.rollcall-filters { display: flex; gap: 1rem; margin-top: 1.5rem; text-align: left; }
+.rollcall-filters label { flex: 1; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.9rem; }
+
+.rollcall-list {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem;
+  max-height: 240px; overflow-y: auto;
+}
+.rollcall-list button { flex: 1 1 calc(50% - 0.5rem); }
+
+select, button {
+  font-size: 1rem; padding: 0.55rem 0.7rem; border-radius: 8px; border: 1px solid #444b5e;
+}
+select { background: #1b1f2a; color: #fff; }
+button {
+  cursor: pointer; background: #4c8bf5; color: #fff; border: none; font-weight: 700; padding: 0.6rem 1rem;
+}
+button:hover { background: #3a72d6; }
+button.secondary { background: #3a4257; }
+button.secondary:hover { background: #4a5474; }
+
+#game-view { min-height: 100vh; display: flex; flex-direction: column; }
+#hud {
+  display: flex; align-items: center; gap: 1rem; padding: 0.6rem 1rem; background: #12151d;
+  border-bottom: 1px solid #2a3040;
+}
+.avatar-icon { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #4c8bf5; background: #333; }
+#my-score { font-weight: 700; font-size: 1.05rem; }
+#game-logout-btn { margin-left: auto; }
+
+#game-body { flex: 1; display: flex; }
+#phaser-container { flex: 1; display: flex; align-items: center; justify-content: center; overflow: auto; }
+
+.modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+  z-index: 50;
+}
+.modal-box {
+  background: #262c3d; padding: 2rem; border-radius: 16px; width: 360px; text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+#question-text { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.25rem; }
+#question-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+#question-choices button {
+  background: #3a4257; padding: 0.8rem; font-size: 1rem;
+}
+#question-choices button:hover { background: #4c8bf5; }
+#question-choices button.correct { background: #2f9e57; }
+#question-choices button.wrong { background: #d9463c; }
+#question-feedback { margin-top: 1rem; min-height: 1.2em; font-weight: 600; }

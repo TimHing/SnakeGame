@@ -5,6 +5,7 @@ import {
 import { Snake } from '../game/snake.js';
 import { randomEmptyCell, cellKey } from '../game/grid.js';
 import { pickQuestion, recordAnswer } from '../game/questionEngine.js';
+import { incrementStudentScore } from '../game/scoreboard.js';
 import { showQuestion } from '../ui/questionModal.js';
 
 const KEY_DIRECTION_MAP = {
@@ -36,7 +37,6 @@ export default class WorldScene extends Phaser.Scene {
 
     this.foodMap = {};
     this.foodIdCounter = 0;
-    this.askedIds = new Set();
     this.tally = { correct: 0, wrong: 0 };
     while (Object.keys(this.foodMap).length < FOOD_TARGET) this.spawnFood();
 
@@ -96,7 +96,7 @@ export default class WorldScene extends Phaser.Scene {
 
     if (Math.random() < QUESTION_TRIGGER_CHANCE) {
       this.pendingQuestion = true;
-      const question = pickQuestion(this.askedIds, this.profile.grade, this.profile.subject);
+      const question = await pickQuestion(this.profile.id, this.profile.questions);
 
       if (!question) {
         // 題庫是空的（Notion 裡還沒有題目）：當作直接吃到，不卡住遊戲
@@ -106,10 +106,12 @@ export default class WorldScene extends Phaser.Scene {
       }
 
       const isCorrect = await showQuestion(question);
-      recordAnswer(this.tally, isCorrect);
+      await recordAnswer(this.profile.id, question, isCorrect);
       if (isCorrect) {
+        this.tally.correct += 1;
         this.grantFood();
       } else {
+        this.tally.wrong += 1;
         this.frozenUntil = this.time.now + WRONG_ANSWER_FREEZE_MS;
       }
       this.pendingQuestion = false;
@@ -122,10 +124,11 @@ export default class WorldScene extends Phaser.Scene {
     this.snake.grow(1);
     this.snake.score += 1;
     document.getElementById('score-value').textContent = this.snake.score;
+    incrementStudentScore(this.profile.id, this.profile.name, 1).catch(() => {});
   }
 
   getSessionSummary() {
-    return { ...this.tally };
+    return { correct: this.tally.correct, wrong: this.tally.wrong, score: this.snake.score };
   }
 
   render() {

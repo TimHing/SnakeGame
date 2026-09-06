@@ -1,5 +1,19 @@
 [
-  { "code": "2年A班-01", "grade": 2, "subject": "multiplication" },
-  { "code": "2年A班-02", "grade": 2, "subject": "multiplication" },
-  { "code": "2年A班-03", "grade": 2, "subject": "multiplication" }
+  {
+    "id": "sample-1",
+    "name": "小明",
+    "questions": [
+      { "id": "sample-1-q1", "question": "2 × 3 = ?", "choices": ["5", "6", "7", "8"], "correctIndex": 1 },
+      { "id": "sample-1-q2", "question": "4 × 5 = ?", "choices": ["18", "20", "22", "9"], "correctIndex": 1 },
+      { "id": "sample-1-q3", "question": "3 × 7 = ?", "choices": ["21", "24", "10", "18"], "correctIndex": 0 }
+    ]
+  },
+  {
+    "id": "sample-2",
+    "name": "小華",
+    "questions": [
+      { "id": "sample-2-q1", "question": "6 × 6 = ?", "choices": ["30", "42", "36", "12"], "correctIndex": 2 },
+      { "id": "sample-2-q2", "question": "8 × 9 = ?", "choices": ["72", "64", "81", "17"], "correctIndex": 0 }
+    ]
+  }
 ]

@@ -1,6 +1,6 @@
-// 一次性本機腳本：產生二年級乘法口訣的種子題目（1~9 × 1~9），直接寫進 Notion 的 Questions 資料庫。
-// 用法：在專案根目錄建立 .env，填好 NOTION_TOKEN 和 NOTION_QUESTIONS_DB_ID，然後執行
-//   npm run seed:notion-questions
+// 一次性本機腳本：產生二年級乘法口訣的種子題目（1~9 × 1~9），直接寫進某個學生專屬的 Questions 資料庫。
+// 用法：在專案根目錄建立 .env，填好 NOTION_TOKEN，然後執行
+//   npm run seed:notion-questions -- <這個學生的 Questions 資料庫 ID 或網址>
 // 這支腳本只會在你自己的電腦上執行一次，不會被 CI 或遊戲本身呼叫。
 import 'dotenv/config';
 import { Client } from '@notionhq/client';
@@ -42,8 +42,6 @@ function generateQuestions() {
       const correctIndex = options.indexOf(correct);
 
       questions.push({
-        grade: 2,
-        subject: 'multiplication',
         question: `${i} × ${j} = ?`,
         choices: options.map(String),
         correctIndex,
@@ -53,29 +51,34 @@ function generateQuestions() {
   return questions;
 }
 
+function extractDatabaseId(raw) {
+  const match = (raw || '').replace(/-/g, '').match(/[0-9a-f]{32}/i);
+  return match ? match[0] : null;
+}
+
 function sleep(ms) {
   return new Promise((resolve) => { setTimeout(resolve, ms); });
 }
 
 async function main() {
   const token = process.env.NOTION_TOKEN;
-  const databaseId = process.env.NOTION_QUESTIONS_DB_ID;
+  const databaseId = extractDatabaseId(process.argv[2] || process.env.NOTION_SEED_TARGET_DB_ID);
   if (!token || !databaseId) {
-    console.error('請先在 .env 設定 NOTION_TOKEN 和 NOTION_QUESTIONS_DB_ID 再執行這支腳本。');
+    console.error('用法：node scripts/seed-notion-questions.mjs <目標學生的 Questions 資料庫網址或 ID>');
+    console.error('需要先在 .env 設定好 NOTION_TOKEN。');
     process.exit(1);
   }
 
   const notion = new Client({ auth: token });
   const questions = generateQuestions();
-  console.log(`準備寫入 ${questions.length} 道題目到 Notion...`);
+  console.log(`準備寫入 ${questions.length} 道題目到 Notion 資料庫 ${databaseId}...`);
 
   for (const q of questions) {
+    // eslint-disable-next-line no-await-in-loop
     await notion.pages.create({
       parent: { database_id: databaseId },
       properties: {
         Question: { title: [{ text: { content: q.question } }] },
-        Grade: { number: q.grade },
-        Subject: { select: { name: q.subject } },
         'Choice A': { rich_text: [{ text: { content: q.choices[0] } }] },
         'Choice B': { rich_text: [{ text: { content: q.choices[1] } }] },
         'Choice C': { rich_text: [{ text: { content: q.choices[2] } }] },
@@ -85,6 +88,7 @@ async function main() {
       },
     });
     process.stdout.write('.');
+    // eslint-disable-next-line no-await-in-loop
     await sleep(350); // 稍微放慢速度，避免撞到 Notion API 速率限制
   }
 

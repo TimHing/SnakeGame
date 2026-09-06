@@ -10,13 +10,9 @@
   <div id="login-view" class="view">
     <div class="login-box">
       <h1>🐍 SnakeG</h1>
-      <p class="muted">選你自己的暱稱開始玩</p>
-      <div class="rollcall-filters">
-        <label>年級<select id="rollcall-grade"></select></label>
-        <label>科目<select id="rollcall-subject"></select></label>
-      </div>
+      <p class="muted">選你自己的名字開始玩</p>
       <div id="rollcall-list" class="rollcall-list"></div>
-      <p id="rollcall-empty" class="muted hidden">這個年級/科目還沒有學生名單，請聯絡老師在 Notion 裡新增。</p>
+      <p id="rollcall-empty" class="muted hidden">還沒有學生名單，請到 Notion 裡新增。</p>
     </div>
   </div>
 
@@ -28,6 +24,16 @@
     </div>
     <div id="game-body">
       <div id="phaser-container"></div>
+      <aside id="leaderboard">
+        <div class="lb-section">
+          <h3>累積總分</h3>
+          <ol id="total-leaderboard-list"></ol>
+        </div>
+        <div class="lb-section">
+          <h3>單次最高分 Top 20</h3>
+          <ol id="high-score-list"></ol>
+        </div>
+      </aside>
     </div>
   </div>
 

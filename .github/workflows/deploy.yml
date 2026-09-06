@@ -33,7 +33,6 @@ jobs:
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_STUDENTS_DB_ID: ${{ secrets.NOTION_STUDENTS_DB_ID }}
-          NOTION_QUESTIONS_DB_ID: ${{ secrets.NOTION_QUESTIONS_DB_ID }}
 
       - run: npm run build
 

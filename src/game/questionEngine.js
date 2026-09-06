@@ -1,28 +1,34 @@
-import questions from '../data/questions.json';
+import {
+  collection, doc, getDoc, getDocs, setDoc, serverTimestamp,
+} from 'firebase/firestore';
+import { db } from '../firebase.js';
 
 /**
- * 抽題（單次遊玩期間，純記憶體狀態，不跨裝置/跨次數保存）：
- * 過濾出該學生年級/科目的題庫，優先抽這次遊玩還沒出過的題目；
- * 整個題庫都出過一輪後，清空紀錄讓下一輪重新開始。
+ * 抽題演算法：從這個學生自己的題庫（pool，來自 Notion 打包好的 JSON）裡，
+ * 找出「這個學生使用次數最低」的那批題目，只在這批裡隨機抽一題。
+ * 保證整個題庫被輪過一輪才會開始重複。進度存在 Firestore，跨裝置/跨次數保存。
  */
-export function pickQuestion(askedIds, grade, subject) {
-  const pool = questions.filter((q) => q.grade === grade && q.subject === subject);
-  if (pool.length === 0) return null;
+export async function pickQuestion(studentId, pool) {
+  if (!pool || pool.length === 0) return null;
 
-  const fresh = pool.filter((q) => !askedIds.has(q.id));
-  const candidates = fresh.length > 0 ? fresh : pool;
-  const picked = candidates[Math.floor(Math.random() * candidates.length)];
+  const progressSnap = await getDocs(collection(db, 'students', studentId, 'questionProgress'));
+  const usageById = {};
+  progressSnap.forEach((d) => { usageById[d.id] = d.data().usageCount || 0; });
 
-  askedIds.add(picked.id);
-  if (askedIds.size >= pool.length) askedIds.clear();
-
-  return picked;
+  const minUsage = Math.min(...pool.map((q) => usageById[q.id] || 0));
+  const candidates = pool.filter((q) => (usageById[q.id] || 0) === minUsage);
+  return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
-export function recordAnswer(tally, isCorrect) {
-  if (isCorrect) {
-    tally.correct += 1;
-  } else {
-    tally.wrong += 1;
-  }
+export async function recordAnswer(studentId, question, isCorrect) {
+  const progressRef = doc(db, 'students', studentId, 'questionProgress', question.id);
+  const progressSnap = await getDoc(progressRef);
+  const prev = progressSnap.exists() ? progressSnap.data() : { usageCount: 0, correctCount: 0, wrongCount: 0 };
+
+  await setDoc(progressRef, {
+    usageCount: (prev.usageCount || 0) + 1,
+    correctCount: (prev.correctCount || 0) + (isCorrect ? 1 : 0),
+    wrongCount: (prev.wrongCount || 0) + (isCorrect ? 0 : 1),
+    lastUsedAt: serverTimestamp(),
+  });
 }

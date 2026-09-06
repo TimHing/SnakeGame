@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 人數少、非公開的私人小遊戲，故意完全開放讀寫，不做 Firebase Auth。
+    match /students/{studentId} {
+      allow read, write: if true;
+
+      match /questionProgress/{questionId} {
+        allow read, write: if true;
+      }
+    }
+
+    // 高分榜是累加紀錄，只允許新增，不允許事後竄改/刪除既有分數。
+    match /highScores/{scoreId} {
+      allow read, create: if true;
+      allow update, delete: if false;
+    }
+  }
+}

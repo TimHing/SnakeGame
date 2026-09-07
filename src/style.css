@@ -69,6 +69,17 @@ button.secondary:hover { background: #4a5474; }
   background: #3a4257; padding: 0.8rem; font-size: 1rem;
 }
 #question-choices button:hover { background: #4c8bf5; }
-#question-choices button.correct { background: #2f9e57; }
+#question-choices button.correct { background: #2f9e57; animation: correct-pop 0.45s ease; }
 #question-choices button.wrong { background: #d9463c; }
 #question-feedback { margin-top: 1rem; min-height: 1.2em; font-weight: 600; }
+#question-feedback.correct { color: #4ade80; animation: feedback-pop 0.45s ease; }
+
+@keyframes correct-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.12); box-shadow: 0 0 0 6px rgba(47, 158, 87, 0.35); }
+  100% { transform: scale(1); box-shadow: none; }
+}
+@keyframes feedback-pop {
+  0% { transform: translateY(4px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}

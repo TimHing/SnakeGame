@@ -3,7 +3,7 @@ import {
   GRID_COLS, GRID_ROWS, CELL_SIZE, TICK_MS, QUESTION_TRIGGER_CHANCE, WRONG_ANSWER_FREEZE_MS, FOOD_TARGET_RATIO,
 } from '../constants.js';
 import { Snake } from '../game/snake.js';
-import { randomEmptyCell, cellKey } from '../game/grid.js';
+import { randomEmptyCell, cellKey, DIRECTIONS } from '../game/grid.js';
 import { pickQuestion, recordAnswer } from '../game/questionEngine.js';
 import { incrementStudentScore } from '../game/scoreboard.js';
 import { showQuestion } from '../ui/questionModal.js';
@@ -38,6 +38,7 @@ export default class WorldScene extends Phaser.Scene {
     this.foodMap = {};
     this.foodIdCounter = 0;
     this.tally = { correct: 0, wrong: 0 };
+    this.headBounce = 1;
     while (Object.keys(this.foodMap).length < FOOD_TARGET) this.spawnFood();
 
     this.keyHandler = (e) => {
@@ -110,6 +111,7 @@ export default class WorldScene extends Phaser.Scene {
       if (isCorrect) {
         this.tally.correct += 1;
         this.grantFood();
+        this.celebrateCorrectAnswer();
       } else {
         this.tally.wrong += 1;
         this.frozenUntil = this.time.now + WRONG_ANSWER_FREEZE_MS;
@@ -125,6 +127,41 @@ export default class WorldScene extends Phaser.Scene {
     this.snake.score += 1;
     document.getElementById('score-value').textContent = this.snake.score;
     incrementStudentScore(this.profile.id, this.profile.name, 1).catch(() => {});
+    this.showScorePopup();
+  }
+
+  showScorePopup() {
+    const head = this.snake.head();
+    const text = this.add.text(
+      head.x * CELL_SIZE + CELL_SIZE / 2,
+      head.y * CELL_SIZE,
+      '+1',
+      { fontSize: '18px', fontStyle: 'bold', color: '#ffcf40' },
+    ).setOrigin(0.5).setDepth(10);
+
+    this.tweens.add({
+      targets: text,
+      y: text.y - 26,
+      alpha: 0,
+      duration: 650,
+      ease: 'Cubic.easeOut',
+      onComplete: () => text.destroy(),
+    });
+  }
+
+  /** 答對題目時的慶祝效果：綠色閃光 + 蛇頭彈跳一下 */
+  celebrateCorrectAnswer() {
+    this.cameras.main.flash(250, 90, 220, 140);
+
+    this.tweens.addCounter({
+      from: 100,
+      to: 112,
+      duration: 120,
+      yoyo: true,
+      ease: 'Quad.easeOut',
+      onUpdate: (tween) => { this.headBounce = tween.getValue() / 100; },
+      onComplete: () => { this.headBounce = 1; },
+    });
   }
 
   getSessionSummary() {
@@ -144,12 +181,40 @@ export default class WorldScene extends Phaser.Scene {
 
   drawSnakeBody(segments, color) {
     segments.forEach((seg, i) => {
-      const alpha = i === 0 ? 1 : 0.75;
-      this.gfx.fillStyle(color, alpha);
-      const pad = i === 0 ? 1 : 2;
+      if (i === 0) {
+        this.drawHead(seg, color);
+        return;
+      }
+      this.gfx.fillStyle(color, 0.75);
+      const pad = 2;
       this.gfx.fillRoundedRect(
         seg.x * CELL_SIZE + pad, seg.y * CELL_SIZE + pad, CELL_SIZE - pad * 2, CELL_SIZE - pad * 2, 4,
       );
+    });
+  }
+
+  /** 蛇頭：比身體更圓、有一雙看向前進方向的眼睛，答對題目時會輕輕彈跳一下 */
+  drawHead(seg, color) {
+    const scale = this.headBounce;
+    const cx = seg.x * CELL_SIZE + CELL_SIZE / 2;
+    const cy = seg.y * CELL_SIZE + CELL_SIZE / 2;
+    const size = CELL_SIZE * scale;
+
+    this.gfx.fillStyle(color, 1);
+    this.gfx.fillRoundedRect(cx - size / 2 + 1, cy - size / 2 + 1, size - 2, size - 2, size * 0.32);
+
+    const dir = DIRECTIONS[this.snake.direction];
+    const forward = { x: dir.x * size * 0.2, y: dir.y * size * 0.2 };
+    const side = { x: -dir.y * size * 0.22, y: dir.x * size * 0.22 };
+    const eyeR = size * 0.11;
+
+    [1, -1].forEach((s) => {
+      const ex = cx + forward.x + side.x * s;
+      const ey = cy + forward.y + side.y * s;
+      this.gfx.fillStyle(0xffffff, 1);
+      this.gfx.fillCircle(ex, ey, eyeR);
+      this.gfx.fillStyle(0x10131a, 1);
+      this.gfx.fillCircle(ex + dir.x * size * 0.05, ey + dir.y * size * 0.05, eyeR * 0.5);
     });
   }
 }

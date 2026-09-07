@@ -12,6 +12,7 @@ export function showQuestion(question) {
     activeResolve = resolve;
     textEl.textContent = question.question;
     feedbackEl.textContent = '';
+    feedbackEl.classList.remove('correct');
     choicesEl.innerHTML = '';
 
     question.choices.forEach((choice, i) => {
@@ -42,6 +43,7 @@ function submitAnswer(index, question) {
   buttons[index].classList.add(isCorrect ? 'correct' : 'wrong');
   if (!isCorrect) buttons[question.correctIndex].classList.add('correct');
   feedbackEl.textContent = isCorrect ? '答對了！蛇變長了 🎉' : '答錯了，這次先不能吃，再試試看～';
+  feedbackEl.classList.toggle('correct', isCorrect);
 
   window.removeEventListener('keydown', keyHandler);
   const resolve = activeResolve;

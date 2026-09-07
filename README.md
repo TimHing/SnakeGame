@@ -44,13 +44,22 @@
 
 ## 三、設定 GitHub Secrets
 
-Repo → Settings → Secrets and variables → Actions → 新增 2 個 Repository secrets：
+Repo → Settings → Secrets and variables → Actions → 新增 3 個 Repository secrets：
 - `NOTION_TOKEN`
 - `NOTION_STUDENTS_DB_ID`
+- `FIREBASE_SERVICE_ACCOUNT`：Firebase Console → 專案設定 → 服務帳戶 → 產生新的私密金鑰，把整份 JSON 內容存進去（只用來讓 CI 部署到 Firebase Hosting，不是 Firestore 用的那組公開設定值）
 
 ## 四、啟用 GitHub Pages
 
 Repo → Settings → Pages → Build and deployment → Source 選「**GitHub Actions**」（一次性手動設定，之後不用再碰）。
+
+## 備援網址：Firebase Hosting
+
+主要網址是 GitHub Pages 的 `https://timhing.github.io/SnakeGame/`。同一次部署也會**額外**把同一份 build 送到 Firebase Hosting：`https://snakegame-91f56.web.app/`——兩邊內容永遠同步，互不依賴。
+
+這是為了應付「GitHub repo 被設成 private，或 GitHub Pages 被關掉」的情況：GitHub Pages 免費方案要求 repo 是 public，一旦轉 private 這個網址就會失效；但 **GitHub Actions 本身不受 public/private 限制**，還是會繼續正常執行，所以 Firebase Hosting 這條線不會受影響，遊戲依然可以透過 `.web.app` 這個網址正常訪問。
+
+**唯一沒辦法繞過的情況**：如果整個 GitHub repo 被刪除（不只是轉 private），兩邊都不會再更新，只會停在最後一次成功部署的版本。
 
 ## 五、第一次匯入題庫
 

@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages + Firebase Hosting
 
 on:
   push:
@@ -40,7 +40,13 @@ jobs:
         with:
           path: dist
 
-  deploy:
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+  # 主要托管：GitHub Pages
+  deploy-pages:
     needs: build
     runs-on: ubuntu-latest
     environment:
@@ -49,3 +55,21 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # 備援托管：Firebase Hosting，同一份 build 產物，跟 GitHub Pages 互相獨立
+  # 就算之後 GitHub repo 轉 private 導致 GitHub Pages 失效，Actions 仍會繼續跑，這條線不受影響
+  deploy-firebase:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          projectId: snakegame-91f56
+          channelId: live

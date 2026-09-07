@@ -39,9 +39,13 @@ bindRollCall({
     game = new Phaser.Game({
       type: Phaser.AUTO,
       parent: 'phaser-container',
-      width: SCENE_SIZE.width,
-      height: SCENE_SIZE.height,
       backgroundColor: '#10131a',
+      scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: SCENE_SIZE.width,
+        height: SCENE_SIZE.height,
+      },
       scene: [],
     });
     game.scene.add('world', WorldScene, true, profile);

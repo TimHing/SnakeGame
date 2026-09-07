@@ -23,7 +23,14 @@
       <button id="game-logout-btn" class="secondary">結束遊玩</button>
     </div>
     <div id="game-body">
-      <div id="phaser-container"></div>
+      <div id="phaser-container">
+        <div id="dpad">
+          <button type="button" class="dpad-btn dpad-up" data-dir="up" aria-label="上">▲</button>
+          <button type="button" class="dpad-btn dpad-left" data-dir="left" aria-label="左">◀</button>
+          <button type="button" class="dpad-btn dpad-right" data-dir="right" aria-label="右">▶</button>
+          <button type="button" class="dpad-btn dpad-down" data-dir="down" aria-label="下">▼</button>
+        </div>
+      </div>
       <aside id="leaderboard">
         <div class="lb-section">
           <h3>累積總分</h3>
@@ -34,13 +41,6 @@
           <ol id="high-score-list"></ol>
         </div>
       </aside>
-    </div>
-
-    <div id="dpad">
-      <button type="button" class="dpad-btn dpad-up" data-dir="up" aria-label="上">▲</button>
-      <button type="button" class="dpad-btn dpad-left" data-dir="left" aria-label="左">◀</button>
-      <button type="button" class="dpad-btn dpad-right" data-dir="right" aria-label="右">▶</button>
-      <button type="button" class="dpad-btn dpad-down" data-dir="down" aria-label="下">▼</button>
     </div>
   </div>
 

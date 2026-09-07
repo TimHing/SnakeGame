@@ -10,7 +10,7 @@ body {
 
 #login-view { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
 .login-box {
-  background: #262c3d; padding: 2.5rem; border-radius: 16px; width: 380px; text-align: center;
+  background: #262c3d; padding: 2.5rem; border-radius: 16px; width: min(380px, 92vw); text-align: center;
   box-shadow: 0 8px 30px rgba(0,0,0,0.35);
 }
 .login-box h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
@@ -44,10 +44,14 @@ button.secondary:hover { background: #4a5474; }
 #my-score { font-weight: 700; font-size: 1.05rem; }
 #game-logout-btn { margin-left: auto; }
 
-#game-body { flex: 1; display: flex; }
-#phaser-container { flex: 1; display: flex; align-items: center; justify-content: center; overflow: auto; }
+#game-body { flex: 1; display: flex; min-height: 0; }
+#phaser-container {
+  position: relative;
+  flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; min-width: 0; min-height: 0;
+}
+#phaser-container canvas { max-width: 100%; max-height: 100%; }
 
-#leaderboard { width: 220px; background: #12151d; border-left: 1px solid #2a3040; padding: 1rem; overflow-y: auto; }
+#leaderboard { width: 220px; flex-shrink: 0; background: #12151d; border-left: 1px solid #2a3040; padding: 1rem; overflow-y: auto; }
 .lb-section + .lb-section { margin-top: 1.5rem; }
 #leaderboard h3 { margin: 0 0 0.75rem; font-size: 0.85rem; color: #9aa3b2; text-transform: uppercase; letter-spacing: 0.05em; }
 #leaderboard ol { list-style: decimal inside; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
@@ -55,11 +59,24 @@ button.secondary:hover { background: #4a5474; }
 #leaderboard .lb-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #leaderboard .lb-score { font-weight: 700; color: #4c8bf5; }
 
+/* 窄螢幕（手機）：排行榜移到遊戲畫面下方，不再跟畫布搶寬度 */
+@media (max-width: 720px) {
+  #game-body { flex-direction: column; }
+  #phaser-container { flex: 0 0 auto; width: 100%; aspect-ratio: 3 / 2; }
+  #leaderboard {
+    width: 100%; flex-shrink: 0; max-height: 30vh;
+    border-left: none; border-top: 1px solid #2a3040;
+    display: flex; gap: 1.5rem; overflow-x: auto;
+  }
+  .lb-section + .lb-section { margin-top: 0; }
+  .lb-section { flex: 1; min-width: 140px; }
+}
+
 /* 觸控方向鍵：預設隱藏，只在觸控裝置（平板/手機）上顯示，避免擋到滑鼠+鍵盤玩家的畫面 */
 #dpad {
   display: none;
-  position: fixed; right: 1.2rem; bottom: 1.2rem; z-index: 40;
-  grid-template-columns: repeat(3, 58px); grid-template-rows: repeat(3, 58px); gap: 6px;
+  position: absolute; right: 0.8rem; bottom: 0.8rem; z-index: 40;
+  grid-template-columns: repeat(3, 52px); grid-template-rows: repeat(3, 52px); gap: 6px;
   touch-action: none;
 }
 @media (pointer: coarse) {
@@ -81,7 +98,7 @@ button.secondary:hover { background: #4a5474; }
   z-index: 50;
 }
 .modal-box {
-  background: #262c3d; padding: 2rem; border-radius: 16px; width: 360px; text-align: center;
+  background: #262c3d; padding: 2rem; border-radius: 16px; width: min(360px, 92vw); text-align: center;
   box-shadow: 0 8px 30px rgba(0,0,0,0.4);
 }
 #question-text { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.25rem; }

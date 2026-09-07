@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import {
   GRID_COLS, GRID_ROWS, CELL_SIZE, TICK_MS, QUESTION_TRIGGER_CHANCE, WRONG_ANSWER_FREEZE_MS, FOOD_TARGET_RATIO,
+  CORRECT_ANSWER_SCORE, WRONG_ANSWER_PENALTY, QUESTION_TIMEOUT_MS,
 } from '../constants.js';
 import { Snake } from '../game/snake.js';
 import { randomEmptyCell, cellKey, DIRECTIONS } from '../game/grid.js';
@@ -106,46 +107,68 @@ export default class WorldScene extends Phaser.Scene {
 
     if (Math.random() < QUESTION_TRIGGER_CHANCE) {
       this.pendingQuestion = true;
-      const question = await pickQuestion(this.profile.id, this.profile.questions);
+      try {
+        // 抽題若卡住太久（例如某些裝置網路不穩、Firestore 請求一直不回應），
+        // 用 race 保底放行，避免 pendingQuestion 卡在 true 導致蛇永遠不動。
+        const question = await Promise.race([
+          pickQuestion(this.profile.id, this.profile.questions),
+          new Promise((resolve) => { setTimeout(() => resolve(null), QUESTION_TIMEOUT_MS); }),
+        ]);
 
-      if (!question) {
-        // 題庫是空的（Notion 裡還沒有題目）：當作直接吃到，不卡住遊戲
+        if (!question) {
+          // 題庫是空的，或抽題逾時：當作直接吃到，不卡住遊戲
+          this.grantFood();
+          return;
+        }
+
+        const isCorrect = await showQuestion(question);
+        // 記錄答題進度是「順便做」的統計，不應該讓遊戲等它——失敗也不影響繼續玩。
+        recordAnswer(this.profile.id, question, isCorrect).catch((err) => {
+          console.warn('[SnakeG] 記錄答題進度失敗（不影響遊戲）', err);
+        });
+
+        if (isCorrect) {
+          this.tally.correct += 1;
+          this.grantFood(CORRECT_ANSWER_SCORE);
+          this.celebrateCorrectAnswer();
+        } else {
+          this.tally.wrong += 1;
+          this.penalizeWrongAnswer();
+          this.frozenUntil = this.time.now + WRONG_ANSWER_FREEZE_MS;
+        }
+      } catch (err) {
+        console.warn('[SnakeG] 題目流程發生錯誤，直接放行避免卡住', err);
         this.grantFood();
+      } finally {
         this.pendingQuestion = false;
-        return;
       }
-
-      const isCorrect = await showQuestion(question);
-      await recordAnswer(this.profile.id, question, isCorrect);
-      if (isCorrect) {
-        this.tally.correct += 1;
-        this.grantFood();
-        this.celebrateCorrectAnswer();
-      } else {
-        this.tally.wrong += 1;
-        this.frozenUntil = this.time.now + WRONG_ANSWER_FREEZE_MS;
-      }
-      this.pendingQuestion = false;
     } else {
       this.grantFood();
     }
   }
 
-  grantFood() {
+  grantFood(points = 1) {
     this.snake.grow(1);
-    this.snake.score += 1;
+    this.snake.score += points;
     document.getElementById('score-value').textContent = this.snake.score;
-    incrementStudentScore(this.profile.id, this.profile.name, 1).catch(() => {});
-    this.showScorePopup();
+    incrementStudentScore(this.profile.id, this.profile.name, points).catch(() => {});
+    this.showScorePopup(points, '#ffcf40');
   }
 
-  showScorePopup() {
+  penalizeWrongAnswer() {
+    this.snake.score -= WRONG_ANSWER_PENALTY;
+    document.getElementById('score-value').textContent = this.snake.score;
+    incrementStudentScore(this.profile.id, this.profile.name, -WRONG_ANSWER_PENALTY).catch(() => {});
+    this.showScorePopup(-WRONG_ANSWER_PENALTY, '#ff6b6b');
+  }
+
+  showScorePopup(points, color) {
     const head = this.snake.head();
     const text = this.add.text(
       head.x * CELL_SIZE + CELL_SIZE / 2,
       head.y * CELL_SIZE,
-      '+1',
-      { fontSize: '18px', fontStyle: 'bold', color: '#ffcf40' },
+      points > 0 ? `+${points}` : `${points}`,
+      { fontSize: '18px', fontStyle: 'bold', color },
     ).setOrigin(0.5).setDepth(10);
 
     this.tweens.add({

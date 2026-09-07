@@ -47,12 +47,21 @@ export default class WorldScene extends Phaser.Scene {
     };
     window.addEventListener('keydown', this.keyHandler);
 
+    this.dpadButtons = Array.from(document.querySelectorAll('.dpad-btn'));
+    this.dpadHandler = (e) => {
+      e.preventDefault();
+      const dir = e.currentTarget.dataset.dir;
+      if (dir) this.snake.setDirection(dir);
+    };
+    this.dpadButtons.forEach((btn) => btn.addEventListener('pointerdown', this.dpadHandler));
+
     this.events.once('shutdown', () => this.cleanup());
     this.events.once('destroy', () => this.cleanup());
   }
 
   cleanup() {
     window.removeEventListener('keydown', this.keyHandler);
+    this.dpadButtons?.forEach((btn) => btn.removeEventListener('pointerdown', this.dpadHandler));
   }
 
   update(time) {

@@ -1,3 +1,5 @@
+import { CORRECT_FEEDBACK_MS, WRONG_FEEDBACK_MS } from '../constants.js';
+
 const modal = document.getElementById('question-modal');
 const textEl = document.getElementById('question-text');
 const choicesEl = document.getElementById('question-choices');
@@ -52,5 +54,5 @@ function submitAnswer(index, question) {
   setTimeout(() => {
     modal.classList.add('hidden');
     resolve(isCorrect);
-  }, 1200);
+  }, isCorrect ? CORRECT_FEEDBACK_MS : WRONG_FEEDBACK_MS);
 }

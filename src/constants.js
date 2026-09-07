@@ -10,6 +10,8 @@ export const MIN_LENGTH = 2; // 扣到底不再扣
 export const SELF_COLLISION_INVINCIBLE_MS = 1000; // 自撞後 1 秒無敵冷卻
 
 export const QUESTION_TRIGGER_CHANCE = 0.4; // 吃道具時觸發題目的機率
-export const WRONG_ANSWER_FREEZE_MS = 2500; // 答錯後短暫停頓
+export const WRONG_ANSWER_FREEZE_MS = 600; // 答錯後短暫停頓
+export const CORRECT_FEEDBACK_MS = 600; // 答對後彈窗停留多久才關閉
+export const WRONG_FEEDBACK_MS = 1100; // 答錯後彈窗停留多久才關閉（比答對久一點，讓學生看清楚正確答案）
 
 export const FOOD_TARGET_RATIO = 0.02; // 場上食物數量目標＝地圖格數的 2%

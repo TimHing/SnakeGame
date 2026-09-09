@@ -14,6 +14,8 @@ const KEY_DIRECTION_MAP = {
   w: 'up', s: 'down', a: 'left', d: 'right', W: 'up', S: 'down', A: 'left', D: 'right',
 };
 
+const SWIPE_MIN_DISTANCE = 28; // px，場景座標，約等於一格 CELL_SIZE(24)
+
 const FOOD_TARGET = Math.max(1, Math.floor(GRID_COLS * GRID_ROWS * FOOD_TARGET_RATIO));
 
 export default class WorldScene extends Phaser.Scene {
@@ -56,6 +58,36 @@ export default class WorldScene extends Phaser.Scene {
     };
     this.dpadButtons.forEach((btn) => btn.addEventListener('pointerdown', this.dpadHandler));
 
+    this.swipeStart = null;
+    this.swipeFired = false;
+    this.onPointerDown = (pointer) => {
+      if (this.swipeStart && this.swipeStart.id !== pointer.id) return;
+      this.swipeStart = { x: pointer.x, y: pointer.y, id: pointer.id };
+      this.swipeFired = false;
+    };
+    this.onPointerMove = (pointer) => {
+      if (!this.swipeStart || pointer.id !== this.swipeStart.id || this.swipeFired) return;
+      const dx = pointer.x - this.swipeStart.x;
+      const dy = pointer.y - this.swipeStart.y;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+      if (Math.max(absDx, absDy) < SWIPE_MIN_DISTANCE) return;
+
+      const dir = absDx > absDy ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+      this.snake.setDirection(dir);
+      this.swipeFired = true;
+    };
+    const endSwipe = (pointer) => {
+      if (this.swipeStart && pointer.id === this.swipeStart.id) this.swipeStart = null;
+    };
+    this.onPointerUp = endSwipe;
+    this.onPointerUpOutside = endSwipe;
+
+    this.input.on('pointerdown', this.onPointerDown);
+    this.input.on('pointermove', this.onPointerMove);
+    this.input.on('pointerup', this.onPointerUp);
+    this.input.on('pointerupoutside', this.onPointerUp);
+
     this.events.once('shutdown', () => this.cleanup());
     this.events.once('destroy', () => this.cleanup());
   }
@@ -63,6 +95,10 @@ export default class WorldScene extends Phaser.Scene {
   cleanup() {
     window.removeEventListener('keydown', this.keyHandler);
     this.dpadButtons?.forEach((btn) => btn.removeEventListener('pointerdown', this.dpadHandler));
+    this.input.off('pointerdown', this.onPointerDown);
+    this.input.off('pointermove', this.onPointerMove);
+    this.input.off('pointerup', this.onPointerUp);
+    this.input.off('pointerupoutside', this.onPointerUp);
   }
 
   update(time) {

@@ -24,10 +24,11 @@ export function createMatch({ durationMs, onRopeChange, onEnd }) {
 
   function applyAnswer(side, isCorrect) {
     if (ended) return;
-    const delta = (side === 'player1') === isCorrect ? -1 : 1;
+    const towardPlayer1 = (side === 'player1') === isCorrect;
+    const delta = towardPlayer1 ? -1 : 1;
     ropePosition += delta;
     tally[side][isCorrect ? 'correctCount' : 'wrongCount'] += 1;
-    onRopeChange(ropePosition);
+    onRopeChange(ropePosition, towardPlayer1 ? 'player1' : 'player2');
 
     if (ropePosition <= -ROPE_HALF_LENGTH) finish('player1');
     else if (ropePosition >= ROPE_HALF_LENGTH) finish('player2');

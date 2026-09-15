@@ -54,6 +54,16 @@ button.secondary:hover { background: #4a5474; }
 .picker-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; text-align: left; }
 .picker-side h2 { font-size: 1rem; margin: 0 0 0.75rem; color: #9aa3b2; }
 
+.avatar-picker { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.9rem; }
+.avatar-select {
+  flex: 1; font-size: 0.9rem; padding: 0.5rem 0.6rem; border-radius: 8px; border: 1px solid #444b5e;
+  background: #1b1f2a; color: #fff;
+}
+.avatar-preview {
+  width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+  background: #1b1f2a; border: 2px solid #4c8bf5;
+}
+
 .rollcall-list {
   display: flex; flex-direction: column; gap: 0.5rem;
   max-height: 320px; overflow-y: auto;
@@ -70,23 +80,74 @@ button.secondary:hover { background: #4a5474; }
 #match-view { display: flex; flex-direction: column; min-height: 100vh; padding: 1rem; }
 #match-timer { text-align: center; font-size: 1.6rem; font-weight: 700; margin-bottom: 0.75rem; }
 
-#rope-area { padding: 0 1rem; margin-bottom: 1.5rem; }
-#rope-track {
-  position: relative; height: 10px; border-radius: 6px; background: #3a4257;
-  margin: 0 24px;
+#rope-area { padding: 0 0.5rem; margin-bottom: 1.5rem; display: flex; justify-content: center; }
+#rope-viewport {
+  position: relative; width: min(720px, 100%); aspect-ratio: 1024 / 340;
+  border-radius: 16px; background: #10131a; overflow: hidden;
+  box-shadow: inset 0 0 0 1px #2a3040;
 }
-.rope-tick {
-  position: absolute; top: -6px; width: 2px; height: 22px; background: #4a5474; transform: translateX(-1px);
+.rope-goal {
+  position: absolute; top: 50%; transform: translateY(-50%); font-size: clamp(1.2rem, 4vw, 1.8rem); z-index: 2;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
 }
-#rope-knot {
-  position: absolute; top: 50%; font-size: 1.8rem; transform: translate(-50%, -50%);
-  transition: left 300ms ease; left: 50%;
+.rope-goal-left { left: 6px; }
+.rope-goal-right { right: 6px; }
+
+/* 圖片本身比容器寬/高各放大 1.6 倍（保持長寬比不變），object-fit: cover 裁掉原圖上下大量留白，
+   只露出角色+繩子那一條橫幅；因為比容器大，可以左右平移（--pan-pct）製造被拉動的感覺，
+   平移範圍控制在容器寬度的 24% 以內，不會露出邊緣空白。 */
+.rope-image {
+  position: absolute; top: 50%; left: 50%;
+  width: 160%; height: 160%;
+  object-fit: cover; object-position: 50% 46%;
+  transform: translate(-50%, -50%) translateX(calc(var(--pan-pct, 0) * 1%));
+  transition: transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+@keyframes rope-kick-left {
+  0% { transform: translate(-50%, -50%) translateX(calc(var(--pan-pct, 0) * 1%)); }
+  35% { transform: translate(-50%, -50%) translateX(calc(var(--pan-pct, 0) * 1% - 18px)) rotate(-1.2deg); }
+  100% { transform: translate(-50%, -50%) translateX(calc(var(--pan-pct, 0) * 1%)); }
+}
+@keyframes rope-kick-right {
+  0% { transform: translate(-50%, -50%) translateX(calc(var(--pan-pct, 0) * 1%)); }
+  35% { transform: translate(-50%, -50%) translateX(calc(var(--pan-pct, 0) * 1% + 18px)) rotate(1.2deg); }
+  100% { transform: translate(-50%, -50%) translateX(calc(var(--pan-pct, 0) * 1%)); }
+}
+.rope-kick-left { animation: rope-kick-left 380ms ease-out; }
+.rope-kick-right { animation: rope-kick-right 380ms ease-out; }
 
 .match-panels { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; min-height: 0; }
 .panel {
+  position: relative;
   background: #262c3d; border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column;
   align-items: center; text-align: center; gap: 0.5rem;
+}
+@keyframes panel-flash-correct {
+  0% { box-shadow: inset 0 0 0 0 rgba(47, 158, 87, 0.6); }
+  100% { box-shadow: inset 0 0 0 10px rgba(47, 158, 87, 0); }
+}
+@keyframes panel-flash-wrong {
+  0% { box-shadow: inset 0 0 0 0 rgba(217, 70, 60, 0.6); }
+  100% { box-shadow: inset 0 0 0 10px rgba(217, 70, 60, 0); }
+}
+.panel-pulse-correct { animation: panel-flash-correct 550ms ease-out; }
+.panel-pulse-wrong { animation: panel-flash-wrong 550ms ease-out; }
+
+.score-pop {
+  position: absolute; top: 12px; left: 50%; font-size: 1.4rem; font-weight: 800;
+  pointer-events: none; z-index: 5;
+  animation: score-pop-float 750ms ease-out forwards;
+}
+.score-pop-correct { color: #4ade80; }
+.score-pop-wrong { color: #ff6b6b; }
+@keyframes score-pop-float {
+  0% { opacity: 0; transform: translate(-50%, 8px) scale(0.7); }
+  30% { opacity: 1; transform: translate(-50%, -8px) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -36px) scale(1); }
+}
+.panel-avatar {
+  width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+  border: 3px solid #4c8bf5; background: #1b1f2a;
 }
 .panel-name { font-size: 1.2rem; font-weight: 700; }
 .panel-score { color: #9aa3b2; font-size: 0.9rem; }

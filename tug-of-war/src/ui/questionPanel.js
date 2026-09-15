@@ -3,6 +3,7 @@
  * onAnswer(isCorrect, question) 由呼叫端決定下一步（更新繩子、記錄權重、抽下一題）。
  */
 export function createQuestionPanel(root, { onAnswer }) {
+  const avatarEl = root.querySelector('.panel-avatar');
   const nameEl = root.querySelector('.panel-name');
   const scoreEl = root.querySelector('.panel-score');
   const textEl = root.querySelector('.panel-question');
@@ -12,6 +13,17 @@ export function createQuestionPanel(root, { onAnswer }) {
 
   function setPlayerName(name) {
     nameEl.textContent = name;
+  }
+
+  /** 賽前選手選擇畫面若有挑寶可夢頭像，帶進來這裡一起顯示；沒選就不顯示 */
+  function setAvatar(avatar) {
+    if (avatar) {
+      avatarEl.src = avatar.src;
+      avatarEl.alt = avatar.name;
+      avatarEl.classList.remove('hidden');
+    } else {
+      avatarEl.classList.add('hidden');
+    }
   }
 
   function setTally(correctCount, wrongCount) {
@@ -37,6 +49,7 @@ export function createQuestionPanel(root, { onAnswer }) {
         btn.classList.add(isCorrect ? 'correct' : 'wrong');
         if (!isCorrect) choicesEl.children[question.correctIndex].classList.add('correct');
         Array.from(choicesEl.children).forEach((b) => { b.disabled = true; });
+        pulse(isCorrect);
         onAnswer(isCorrect, question);
       });
       choicesEl.appendChild(btn);
@@ -49,7 +62,22 @@ export function createQuestionPanel(root, { onAnswer }) {
     choicesEl.innerHTML = '';
   }
 
+  /** 答題當下的即時視覺回饋：面板閃一下顏色 + 浮出一個 +1／-1 的小動畫 */
+  function pulse(isCorrect) {
+    const flashClass = isCorrect ? 'panel-pulse-correct' : 'panel-pulse-wrong';
+    root.classList.remove('panel-pulse-correct', 'panel-pulse-wrong');
+    // eslint-disable-next-line no-unused-expressions
+    root.offsetWidth; // 強制 reflow，讓連續同一種結果也能重新觸發動畫
+    root.classList.add(flashClass);
+
+    const pop = document.createElement('div');
+    pop.className = `score-pop ${isCorrect ? 'score-pop-correct' : 'score-pop-wrong'}`;
+    pop.textContent = isCorrect ? '+1 🎉' : '-1 😵';
+    root.appendChild(pop);
+    pop.addEventListener('animationend', () => pop.remove());
+  }
+
   return {
-    setPlayerName, setTally, showQuestion, showEnded,
+    setPlayerName, setAvatar, setTally, showQuestion, showEnded,
   };
 }

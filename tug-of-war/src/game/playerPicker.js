@@ -1,10 +1,16 @@
 import students from '../data/students.json';
+import { POKEMON_AVATARS } from './pokemonAvatars.js';
 
 const view = document.getElementById('picker-view');
 const leftListEl = document.getElementById('picker-left-list');
 const rightListEl = document.getElementById('picker-right-list');
 const startBtn = document.getElementById('picker-start-btn');
 const emptyMsg = document.getElementById('picker-empty');
+
+const leftAvatarSelect = document.getElementById('picker-left-avatar');
+const rightAvatarSelect = document.getElementById('picker-right-avatar');
+const leftAvatarPreview = document.getElementById('picker-left-avatar-preview');
+const rightAvatarPreview = document.getElementById('picker-right-avatar-preview');
 
 let leftPick = null;
 let rightPick = null;
@@ -68,9 +74,42 @@ function refresh() {
   emptyMsg.classList.toggle('hidden', students.length >= 2);
 }
 
+/** 選手選擇畫面上的寶可夢頭像下拉選單：可不選，選了立刻在旁邊顯示預覽圖 */
+function setupAvatarPicker(selectEl, previewEl) {
+  POKEMON_AVATARS.forEach((avatar) => {
+    const option = document.createElement('option');
+    option.value = avatar.id;
+    option.textContent = avatar.name;
+    selectEl.appendChild(option);
+  });
+
+  selectEl.addEventListener('change', () => {
+    const avatar = POKEMON_AVATARS.find((a) => a.id === selectEl.value);
+    if (avatar) {
+      previewEl.src = avatar.src;
+      previewEl.classList.remove('hidden');
+    } else {
+      previewEl.classList.add('hidden');
+    }
+  });
+}
+
+setupAvatarPicker(leftAvatarSelect, leftAvatarPreview);
+setupAvatarPicker(rightAvatarSelect, rightAvatarPreview);
+
+function getSelectedAvatar(selectEl) {
+  return POKEMON_AVATARS.find((a) => a.id === selectEl.value) || null;
+}
+
+function resetAvatarPickers() {
+  [leftAvatarSelect, rightAvatarSelect].forEach((el) => { el.value = ''; });
+  [leftAvatarPreview, rightAvatarPreview].forEach((el) => el.classList.add('hidden'));
+}
+
 export function showPickerView() {
   leftPick = null;
   rightPick = null;
+  resetAvatarPickers();
   refresh();
   view.classList.remove('hidden');
 }
@@ -83,6 +122,9 @@ export function bindPlayerPicker({ onConfirm }) {
   startBtn.addEventListener('click', () => {
     if (!leftPick || !rightPick) return;
     hidePickerView();
-    onConfirm({ player1: leftPick, player2: rightPick });
+    onConfirm({
+      player1: { ...leftPick, avatar: getSelectedAvatar(leftAvatarSelect) },
+      player2: { ...rightPick, avatar: getSelectedAvatar(rightAvatarSelect) },
+    });
   });
 }

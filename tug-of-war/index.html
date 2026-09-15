@@ -33,10 +33,22 @@
       <div class="picker-columns">
         <div class="picker-side">
           <h2>選手一（左）</h2>
+          <div class="avatar-picker">
+            <select id="picker-left-avatar" class="avatar-select">
+              <option value="">選一隻寶可夢當頭像（可不選）</option>
+            </select>
+            <img id="picker-left-avatar-preview" class="avatar-preview hidden" alt="" />
+          </div>
           <div id="picker-left-list" class="rollcall-list"></div>
         </div>
         <div class="picker-side">
           <h2>選手二（右）</h2>
+          <div class="avatar-picker">
+            <select id="picker-right-avatar" class="avatar-select">
+              <option value="">選一隻寶可夢當頭像（可不選）</option>
+            </select>
+            <img id="picker-right-avatar-preview" class="avatar-preview hidden" alt="" />
+          </div>
           <div id="picker-right-list" class="rollcall-list"></div>
         </div>
       </div>
@@ -47,18 +59,22 @@
   <div id="match-view" class="view hidden">
     <div id="match-timer">5:00</div>
     <div id="rope-area">
-      <div id="rope-track">
-        <div id="rope-knot">🪢</div>
+      <div id="rope-viewport">
+        <span class="rope-goal rope-goal-left" title="選手一勝利線">🚩</span>
+        <img id="rope-image" alt="拔河" />
+        <span class="rope-goal rope-goal-right" title="選手二勝利線">🚩</span>
       </div>
     </div>
     <div class="match-panels">
       <div id="panel-player1" class="panel panel-left">
+        <img class="panel-avatar hidden" alt="" />
         <div class="panel-name"></div>
         <div class="panel-score"></div>
         <p class="panel-question"></p>
         <div class="panel-choices"></div>
       </div>
       <div id="panel-player2" class="panel panel-right">
+        <img class="panel-avatar hidden" alt="" />
         <div class="panel-name"></div>
         <div class="panel-score"></div>
         <p class="panel-question"></p>

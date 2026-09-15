@@ -1,6 +1,6 @@
 import { showDurationView, bindDurationPicker } from './ui/durationPicker.js';
 import { showPickerView, bindPlayerPicker } from './game/playerPicker.js';
-import { renderRope, renderRopeTicks } from './ui/ropeView.js';
+import { renderRope, resetRope, kickRope } from './ui/ropeView.js';
 import { createQuestionPanel } from './ui/questionPanel.js';
 import { createMatch } from './game/matchEngine.js';
 import {
@@ -30,7 +30,6 @@ let players = null;
 let weights = null;
 const panels = { player1: panel1, player2: panel2 };
 
-renderRopeTicks();
 refreshStandings();
 
 function refreshStandings() {
@@ -72,9 +71,11 @@ async function startMatch({ player1, player2, durationMin }) {
 
   panel1.setPlayerName(player1.name);
   panel2.setPlayerName(player2.name);
+  panel1.setAvatar(player1.avatar);
+  panel2.setAvatar(player2.avatar);
   panel1.setTally(0, 0);
   panel2.setTally(0, 0);
-  renderRope(0);
+  resetRope();
 
   const durationMs = durationMin * 60 * 1000;
   let secondsLeft = Math.round(durationMs / 1000);
@@ -87,7 +88,10 @@ async function startMatch({ player1, player2, durationMin }) {
 
   match = createMatch({
     durationMs,
-    onRopeChange: renderRope,
+    onRopeChange: (position, direction) => {
+      renderRope(position);
+      kickRope(direction);
+    },
     onEnd: ({ winner, ropePosition, tally }) => {
       clearInterval(tickId);
       panel1.showEnded('比賽結束！');

@@ -1,6 +1,8 @@
 import { showDurationView, bindDurationPicker } from './ui/durationPicker.js';
 import { showPickerView, bindPlayerPicker } from './game/playerPicker.js';
-import { renderRope, resetRope, kickRope } from './ui/ropeView.js';
+import {
+  renderRope, resetRope, kickRope, setAvatars,
+} from './ui/ropeView.js';
 import { createQuestionPanel } from './ui/questionPanel.js';
 import { createMatch } from './game/matchEngine.js';
 import {
@@ -75,6 +77,7 @@ async function startMatch({ player1, player2, durationMin }) {
   panel2.setAvatar(player2.avatar);
   panel1.setTally(0, 0);
   panel2.setTally(0, 0);
+  setAvatars(player1, player2);
   resetRope();
 
   const durationMs = durationMin * 60 * 1000;

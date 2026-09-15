@@ -1,10 +1,4 @@
 node_modules/
 dist/
-pages-dist/
-*.log
-.DS_Store
-.claude/
 .firebase/
-
-.env
 src/data/students.json

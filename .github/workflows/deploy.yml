@@ -36,9 +36,23 @@ jobs:
 
       - run: npm run build
 
+      # 拔河問答（tug-of-war/）用同一次剛同步好的資料一起 build，塞進 GitHub Pages 產物的 /tug-of-war 子路徑。
+      # 不影響上面 Snake Game 的 dist/：下面的 upload-artifact（給 deploy-firebase 用）路徑還是原本的 dist，內容不變。
+      - run: node tug-of-war/scripts/prepare-data.mjs
+      - run: npm ci
+        working-directory: tug-of-war
+      - run: npm run build
+        working-directory: tug-of-war
+
+      - run: |
+          mkdir -p pages-dist
+          cp -r dist/. pages-dist/
+          mkdir -p pages-dist/tug-of-war
+          cp -r tug-of-war/dist/. pages-dist/tug-of-war/
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: pages-dist
 
       - uses: actions/upload-artifact@v4
         with:

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>拔河問答 — SnakeG</title>
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body>
+  <div id="duration-view" class="view">
+    <div class="login-box">
+      <h1>🪢 拔河問答</h1>
+      <p class="muted">先選比賽時長</p>
+      <div class="duration-control">
+        <button type="button" id="duration-minus" class="secondary">－</button>
+        <span id="duration-value">5 分鐘</span>
+        <button type="button" id="duration-plus" class="secondary">＋</button>
+      </div>
+      <button type="button" id="duration-start-btn">下一步：選手選擇</button>
+
+      <div class="tow-leaderboard">
+        <h3>勝場排行榜</h3>
+        <ol id="tow-leaderboard-list"></ol>
+        <p id="tow-leaderboard-empty" class="muted hidden">還沒有對戰紀錄。</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="picker-view" class="view hidden">
+    <div class="picker-box">
+      <h1>選手選擇</h1>
+      <p id="picker-empty" class="muted hidden">學生名單至少要有兩人才能對戰。</p>
+      <div class="picker-columns">
+        <div class="picker-side">
+          <h2>選手一（左）</h2>
+          <div id="picker-left-list" class="rollcall-list"></div>
+        </div>
+        <div class="picker-side">
+          <h2>選手二（右）</h2>
+          <div id="picker-right-list" class="rollcall-list"></div>
+        </div>
+      </div>
+      <button type="button" id="picker-start-btn" disabled>開始拔河！</button>
+    </div>
+  </div>
+
+  <div id="match-view" class="view hidden">
+    <div id="match-timer">5:00</div>
+    <div id="rope-area">
+      <div id="rope-track">
+        <div id="rope-knot">🪢</div>
+      </div>
+    </div>
+    <div class="match-panels">
+      <div id="panel-player1" class="panel panel-left">
+        <div class="panel-name"></div>
+        <div class="panel-score"></div>
+        <p class="panel-question"></p>
+        <div class="panel-choices"></div>
+      </div>
+      <div id="panel-player2" class="panel panel-right">
+        <div class="panel-name"></div>
+        <div class="panel-score"></div>
+        <p class="panel-question"></p>
+        <div class="panel-choices"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="result-view" class="view hidden">
+    <div class="login-box">
+      <h1>比賽結束</h1>
+      <p id="result-text"></p>
+      <button type="button" id="replay-btn">再玩一局</button>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

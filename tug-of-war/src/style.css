@@ -1,0 +1,110 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans TC', sans-serif;
+  background: #1b1f2a;
+  color: #fff;
+}
+.hidden { display: none !important; }
+.muted { color: #9aa3b2; font-size: 0.9rem; }
+
+.view { min-height: 100vh; }
+
+button {
+  font-size: 1rem; border-radius: 8px; cursor: pointer; background: #4c8bf5; color: #fff;
+  border: none; font-weight: 700; padding: 0.6rem 1rem;
+}
+button:hover { background: #3a72d6; }
+button:disabled { background: #3a4257; cursor: not-allowed; opacity: 0.6; }
+button.secondary { background: #3a4257; }
+button.secondary:hover { background: #4a5474; }
+
+/* 賽前設定：時長選擇 + 排行榜 */
+#duration-view { display: flex; align-items: center; justify-content: center; }
+.login-box {
+  background: #262c3d; padding: 2.5rem; border-radius: 16px; width: min(420px, 92vw); text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+}
+.login-box h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
+.login-box > button { margin-top: 1.25rem; width: 100%; }
+
+.duration-control {
+  display: flex; align-items: center; justify-content: center; gap: 1rem; margin: 1.5rem 0 0;
+}
+.duration-control span { font-size: 1.4rem; font-weight: 700; min-width: 6ch; }
+.duration-control button { width: 44px; height: 44px; padding: 0; font-size: 1.3rem; }
+
+.tow-leaderboard { margin-top: 2rem; text-align: left; }
+.tow-leaderboard h3 {
+  margin: 0 0 0.75rem; font-size: 0.85rem; color: #9aa3b2; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.tow-leaderboard ol { list-style: decimal inside; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.tow-leaderboard li { display: flex; justify-content: space-between; gap: 0.5rem; font-size: 0.9rem; }
+.lb-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-score { font-weight: 700; color: #4c8bf5; }
+
+/* 選手選擇（左右分區） */
+#picker-view { display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+.picker-box {
+  background: #262c3d; padding: 2rem; border-radius: 16px; width: min(760px, 96vw); text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+}
+.picker-box h1 { margin: 0 0 1rem; }
+.picker-box > button { margin-top: 1.25rem; width: 100%; }
+.picker-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; text-align: left; }
+.picker-side h2 { font-size: 1rem; margin: 0 0 0.75rem; color: #9aa3b2; }
+
+.rollcall-list {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  max-height: 320px; overflow-y: auto;
+}
+.rollcall-item { display: flex; flex-direction: column; gap: 0.4rem; }
+.rollcall-pin { display: flex; gap: 0.4rem; align-items: center; }
+.rollcall-pin input {
+  flex: 1; font-size: 1rem; padding: 0.5rem 0.6rem; border-radius: 8px; border: 1px solid #444b5e;
+  background: #1b1f2a; color: #fff;
+}
+.error { color: #ff6b6b; font-size: 0.85rem; min-height: 1.2em; margin: 0; text-align: left; }
+
+/* 對戰畫面：拔河繩 + 左右題目面板 */
+#match-view { display: flex; flex-direction: column; min-height: 100vh; padding: 1rem; }
+#match-timer { text-align: center; font-size: 1.6rem; font-weight: 700; margin-bottom: 0.75rem; }
+
+#rope-area { padding: 0 1rem; margin-bottom: 1.5rem; }
+#rope-track {
+  position: relative; height: 10px; border-radius: 6px; background: #3a4257;
+  margin: 0 24px;
+}
+.rope-tick {
+  position: absolute; top: -6px; width: 2px; height: 22px; background: #4a5474; transform: translateX(-1px);
+}
+#rope-knot {
+  position: absolute; top: 50%; font-size: 1.8rem; transform: translate(-50%, -50%);
+  transition: left 300ms ease; left: 50%;
+}
+
+.match-panels { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; min-height: 0; }
+.panel {
+  background: #262c3d; border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column;
+  align-items: center; text-align: center; gap: 0.5rem;
+}
+.panel-name { font-size: 1.2rem; font-weight: 700; }
+.panel-score { color: #9aa3b2; font-size: 0.9rem; }
+.panel-question { font-size: 1.1rem; font-weight: 700; margin: 1rem 0; min-height: 2.4em; }
+.panel-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; width: 100%; }
+.panel-choices button {
+  background: #3a4257; padding: 0.8rem 0.5rem; font-size: 0.95rem; width: 100%;
+}
+.panel-choices button:hover:not(:disabled) { background: #4c8bf5; }
+.panel-choices button.correct { background: #2f9e57; }
+.panel-choices button.wrong { background: #d9463c; }
+
+/* 窄螢幕：左右面板改上下疊放，比較好用觸控 */
+@media (max-width: 720px) {
+  .picker-columns { grid-template-columns: 1fr; }
+  .match-panels { grid-template-columns: 1fr; }
+}
+
+/* 結算畫面 */
+#result-view { display: flex; align-items: center; justify-content: center; }
+#result-text { white-space: pre-line; line-height: 1.6; margin: 1rem 0; }

@@ -1,0 +1,54 @@
+name: Deploy Tug of War Quiz to Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tug-of-war/**'
+      - 'scripts/sync-notion.mjs'
+      - 'src/data/students.sample.json'
+      - '.github/workflows/deploy-tugofwar.yml'
+  schedule:
+    - cron: '0 * * * *' # 每小時同步一次 Notion，讓老師只改 Notion 也能自動更新這個遊戲
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tugofwar-hosting
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # 重用 Snake Game 既有的 sync 腳本（唯讀查詢 Notion，原檔案不動），
+      # 讓拔河問答跟 Snake Game 抓到同一份學生/題庫資料。
+      - run: node scripts/sync-notion.mjs
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_STUDENTS_DB_ID: ${{ secrets.NOTION_STUDENTS_DB_ID }}
+
+      - run: npm ci
+        working-directory: tug-of-war
+
+      - run: npm run build
+        working-directory: tug-of-war
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          projectId: snakegame-91f56
+          entryPoint: tug-of-war
+          channelId: live

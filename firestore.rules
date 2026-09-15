@@ -15,5 +15,19 @@ service cloud.firestore {
       allow read, create: if true;
       allow update, delete: if false;
     }
+
+    // 拔河問答小遊戲（tug-of-war/）專用的 collection，跟上面 Snake Game 的
+    // students/highScores 完全分開存放，兩個遊戲互不影響。
+    match /tugofwar_matches/{matchId} {
+      allow read, create: if true;
+      allow update, delete: if false;
+    }
+    match /tugofwar_students/{studentId} {
+      allow read, write: if true;
+
+      match /questions/{questionId} {
+        allow read, write: if true;
+      }
+    }
   }
 }

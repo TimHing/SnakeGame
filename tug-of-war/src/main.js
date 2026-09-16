@@ -12,13 +12,18 @@ import {
   recordMatch, updateStanding, fetchStandings,
 } from './game/matchResult.js';
 import { renderStandings } from './ui/leaderboard.js';
+import { celebrate, clearCelebration } from './ui/celebration.js';
 import { ANSWER_FEEDBACK_MS } from './constants.js';
 
 const matchView = document.getElementById('match-view');
 const resultView = document.getElementById('result-view');
+const resultHeadline = document.getElementById('result-headline');
 const resultText = document.getElementById('result-text');
-const replayBtn = document.getElementById('replay-btn');
+const rematchBtn = document.getElementById('rematch-btn');
+const endGameBtn = document.getElementById('end-game-btn');
 const timerEl = document.getElementById('match-timer');
+
+let lastMatchParams = null; // 供「再來一局」直接沿用同兩位選手、同比賽時長重新開一局
 
 const panel1 = createQuestionPanel(document.getElementById('panel-player1'), {
   onAnswer: (isCorrect, question) => handleAnswer('player1', isCorrect, question),
@@ -61,8 +66,12 @@ function handleAnswer(side, isCorrect, question) {
 }
 
 async function startMatch({ player1, player2, durationMin }) {
+  lastMatchParams = { player1, player2, durationMin };
   matchView.classList.remove('hidden');
   resultView.classList.add('hidden');
+  clearCelebration();
+  panel1.resetCelebration();
+  panel2.resetCelebration();
 
   players = { player1, player2 };
   const [weights1, weights2] = await Promise.all([
@@ -112,15 +121,21 @@ async function startMatch({ player1, player2, durationMin }) {
 async function finishMatch({
   player1, player2, durationMin, ropePosition, winner, tally,
 }) {
-  matchView.classList.add('hidden');
+  // 故意不隱藏 matchView：讓拔河繩/面板停留在比賽結束當下的畫面，結果只是疊一層浮層上去，
+  // 不會有「跳回首頁」的感覺；按「再來一局」或「結束遊戲」才真的離開這個畫面。
   resultView.classList.remove('hidden');
 
   const line1 = `${player1.name}：對 ${tally.player1.correctCount}／錯 ${tally.player1.wrongCount}`;
   const line2 = `${player2.name}：對 ${tally.player2.correctCount}／錯 ${tally.player2.wrongCount}`;
-  const headline = winner === 'draw'
-    ? '平手！'
-    : `${winner === 'player1' ? player1.name : player2.name} 獲勝！`;
-  resultText.textContent = `${headline}\n${line1}\n${line2}`;
+  resultHeadline.textContent = winner === 'draw'
+    ? '🤝 平手！'
+    : `🏆 ${winner === 'player1' ? player1.name : player2.name} 獲勝！`;
+  resultText.textContent = `${line1}\n${line2}`;
+
+  if (winner !== 'draw') {
+    panels[winner].celebrate();
+    celebrate();
+  }
 
   try {
     await recordMatch({
@@ -153,8 +168,17 @@ bindPlayerPicker({
   onConfirm: ({ player1, player2 }) => startMatch({ player1, player2, durationMin: pendingDurationMin }),
 });
 
-replayBtn.addEventListener('click', () => {
+rematchBtn.addEventListener('click', () => {
   resultView.classList.add('hidden');
+  if (lastMatchParams) startMatch(lastMatchParams);
+});
+
+endGameBtn.addEventListener('click', () => {
+  resultView.classList.add('hidden');
+  matchView.classList.add('hidden');
+  clearCelebration();
+  panel1.resetCelebration();
+  panel2.resetCelebration();
   showDurationView();
 });
 

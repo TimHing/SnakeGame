@@ -173,6 +173,12 @@ button.secondary:hover { background: #4a5474; }
   width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
   border: 3px solid #4c8bf5; background: #1b1f2a;
 }
+/* 比賽結束時，贏方的面板持續發光慶祝，直到下一局開始才清掉 */
+.panel-winner { animation: panel-winner-glow 1.1s ease-in-out infinite alternate; }
+@keyframes panel-winner-glow {
+  from { box-shadow: 0 0 0 3px #ffd166, 0 0 16px 4px rgba(255, 209, 102, 0.5); }
+  to { box-shadow: 0 0 0 3px #ffd166, 0 0 30px 10px rgba(255, 209, 102, 0.85); }
+}
 .panel-name { font-size: 1.2rem; font-weight: 700; }
 .panel-score { color: #9aa3b2; font-size: 0.9rem; }
 .panel-question { font-size: 1.1rem; font-weight: 700; margin: 1rem 0; min-height: 2.4em; }
@@ -190,6 +196,28 @@ button.secondary:hover { background: #4a5474; }
   .match-panels { grid-template-columns: 1fr; }
 }
 
-/* 結算畫面 */
-#result-view { display: flex; align-items: center; justify-content: center; }
+/* 結算畫面：蓋在對戰畫面上方的浮層，底下的拔河繩/面板維持原樣不跳走，
+   讓玩家還能看到比賽結束當下的畫面，只是疊了一層結果卡片。 */
+#result-view {
+  position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, 0.65);
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+}
+#result-headline { animation: result-pop 400ms ease-out; }
+@keyframes result-pop {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
 #result-text { white-space: pre-line; line-height: 1.6; margin: 1rem 0; }
+.result-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+.result-actions button { flex: 1; }
+
+/* 贏家慶祝：滿版彩帶紙屑，只在有人贏（不是平手）時才灑出來 */
+#confetti-layer { position: fixed; inset: 0; z-index: 70; pointer-events: none; overflow: hidden; }
+.confetti-piece {
+  position: absolute; top: -20px; width: 8px; height: 14px; opacity: 0.9; border-radius: 2px;
+  animation-name: confetti-fall; animation-timing-function: ease-in; animation-fill-mode: forwards;
+}
+@keyframes confetti-fall {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--drift, 0px), 110vh) rotate(540deg); opacity: 0.85; }
+}

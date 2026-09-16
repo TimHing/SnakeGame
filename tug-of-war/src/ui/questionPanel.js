@@ -62,6 +62,15 @@ export function createQuestionPanel(root, { onAnswer }) {
     choicesEl.innerHTML = '';
   }
 
+  /** 比賽結束時，贏方的面板持續發光慶祝；下一局開始前要記得呼叫 resetCelebration() 清掉 */
+  function celebrate() {
+    root.classList.add('panel-winner');
+  }
+
+  function resetCelebration() {
+    root.classList.remove('panel-winner');
+  }
+
   /** 答題當下的即時視覺回饋：面板閃一下顏色 + 浮出一個 +1／-1 的小動畫 */
   function pulse(isCorrect) {
     const flashClass = isCorrect ? 'panel-pulse-correct' : 'panel-pulse-wrong';
@@ -78,6 +87,6 @@ export function createQuestionPanel(root, { onAnswer }) {
   }
 
   return {
-    setPlayerName, setAvatar, setTally, showQuestion, showEnded,
+    setPlayerName, setAvatar, setTally, showQuestion, showEnded, celebrate, resetCelebration,
   };
 }

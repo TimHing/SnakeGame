@@ -91,13 +91,18 @@
     </div>
   </div>
 
-  <div id="result-view" class="view hidden">
+  <div id="result-view" class="hidden">
     <div class="login-box">
-      <h1>比賽結束</h1>
+      <h1 id="result-headline">比賽結束</h1>
       <p id="result-text"></p>
-      <button type="button" id="replay-btn">再玩一局</button>
+      <div class="result-actions">
+        <button type="button" id="rematch-btn">再來一局</button>
+        <button type="button" id="end-game-btn" class="secondary">結束遊戲</button>
+      </div>
     </div>
   </div>
+
+  <div id="confetti-layer"></div>
 
   <script type="module" src="./src/main.js"></script>
 </body>

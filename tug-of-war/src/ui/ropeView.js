@@ -1,9 +1,12 @@
 import { ROPE_HALF_LENGTH } from '../constants.js';
 
-const trackEl = document.getElementById('rope-track');
-const knotEl = document.getElementById('rope-knot');
+const trainEl = document.getElementById('rope-train');
 const leftAvatarEl = document.getElementById('rope-avatar-left');
 const rightAvatarEl = document.getElementById('rope-avatar-right');
+
+// 整條隊伍最多平移「自己寬度」的 26%；#rope-viewport 比隊伍本身窄一些，
+// 平移到底時，離中心最遠的隊員（甚至頭像）就會被拖出可視範圍外而消失，營造緊張感。
+const MAX_PAN_PERCENT = 26;
 
 /** 選手選擇畫面挑的寶可夢頭像，直接當拉繩子的角色；沒選頭像就退回顯示名字的第一個字 */
 function renderAvatarEl(el, avatar, name) {
@@ -25,26 +28,17 @@ export function setAvatars(player1, player2) {
   renderAvatarEl(rightAvatarEl, player2.avatar, player2.name);
 }
 
-/** 賽前呼叫一次，把刻度畫出來、繩結歸零到正中央 */
+/** 賽前呼叫一次，把隊伍歸位到正中央 */
 export function resetRope() {
-  trackEl.querySelectorAll('.rope-tick').forEach((t) => t.remove());
-  const total = ROPE_HALF_LENGTH * 2;
-  for (let i = 0; i <= total; i += 1) {
-    const tick = document.createElement('div');
-    tick.className = 'rope-tick';
-    tick.style.left = `${(i / total) * 100}%`;
-    trackEl.appendChild(tick);
-  }
-  knotEl.style.left = '50%';
+  trainEl.style.setProperty('--pan-pct', '0');
   leftAvatarEl.classList.remove('rope-pulse');
   rightAvatarEl.classList.remove('rope-pulse');
 }
 
-/** 依繩子位置（-ROPE_HALF_LENGTH ~ +ROPE_HALF_LENGTH）更新繩結的水平位置 */
+/** 依繩子位置（-ROPE_HALF_LENGTH ~ +ROPE_HALF_LENGTH）平移整條隊伍 */
 export function renderRope(position) {
   const ratio = position / ROPE_HALF_LENGTH; // -1 ~ 1
-  const percent = 50 + ratio * 50; // 0% ~ 100%
-  knotEl.style.left = `${percent}%`;
+  trainEl.style.setProperty('--pan-pct', (ratio * MAX_PAN_PERCENT).toFixed(1));
 }
 
 /** 每次得分時呼叫，讓拉贏的那一方頭像蹦一下，direction 是 'player1' 或 'player2' */

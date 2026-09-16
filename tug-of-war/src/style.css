@@ -80,38 +80,50 @@ button.secondary:hover { background: #4a5474; }
 #match-view { display: flex; flex-direction: column; min-height: 100vh; padding: 1rem; }
 #match-timer { text-align: center; font-size: 1.6rem; font-weight: 700; margin-bottom: 0.75rem; }
 
-#rope-area { padding: 0 0.5rem; margin-bottom: 1.5rem; }
+#rope-area { padding: 0 0.5rem; margin-bottom: 1.5rem; display: flex; justify-content: center; }
+
+/* 外層固定寬度、overflow:hidden 當「畫面框」；輸的一方連人帶繩被拖到框外時就直接被裁掉不顯示，
+   這正是要營造的緊張感——越接近秒殺，被拉贏那一方自己的隊員（甚至頭像）會愈來愈常被拖出畫面。 */
 #rope-viewport {
-  display: flex; align-items: center; gap: clamp(0.5rem, 2vw, 1.25rem);
-  background: #10131a; border-radius: 16px; padding: 1rem clamp(0.75rem, 3vw, 1.5rem);
+  width: min(560px, 96vw); overflow: hidden;
+  background: #10131a; border-radius: 16px; padding: 1rem clamp(0.5rem, 3vw, 1.25rem);
   box-shadow: inset 0 0 0 1px #2a3040;
+  display: flex; justify-content: center;
 }
 
-/* 選手選擇畫面挑的寶可夢頭像，直接當這位選手在拔河繩兩端「拉繩子的角色」；
+/* 整條「拔河隊伍」：兩邊各兩個小隊員 + 主頭像，中間隔一小段繩子空隙、紅旗。
+   每次得分，整條隊伍一起平移（--pan-pct，相對自己寬度的百分比，響應式不受螢幕大小影響）。 */
+#rope-train {
+  display: flex; align-items: center; gap: clamp(4px, 1.5vw, 8px); flex-shrink: 0;
+  transform: translateX(calc(var(--pan-pct, 0) * 1%));
+  transition: transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.rope-mate {
+  width: clamp(24px, 6vw, 36px); height: clamp(24px, 6vw, 36px); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: clamp(0.8rem, 2.2vw, 1.1rem);
+  background: #262c3d; border: 2px solid #3a4257; flex-shrink: 0; opacity: 0.85;
+}
+
+/* 選手選擇畫面挑的寶可夢頭像，直接當這位選手在拔河繩上「帶隊拉繩的角色」；
    沒選頭像的話退回顯示名字的第一個字，一樣圈成頭像的樣子。 */
 .rope-avatar {
-  width: clamp(48px, 10vw, 72px); height: clamp(48px, 10vw, 72px); border-radius: 50%;
+  width: clamp(44px, 10vw, 60px); height: clamp(44px, 10vw, 60px); border-radius: 50%;
   flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center;
-  font-size: 1.3rem; font-weight: 800; background: #262c3d; border: 3px solid #4c8bf5;
+  font-size: 1.2rem; font-weight: 800; background: #262c3d; border: 3px solid #4c8bf5;
   transition: transform 220ms ease;
 }
 .rope-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .rope-avatar-right { transform: scaleX(-1); } /* 整個頭像翻面，看起來像面向繩子中間、在對拉 */
 .rope-avatar-right span { transform: scaleX(-1); } /* 但退回顯示的名字縮寫要翻回正常方向，不然會變成鏡像字 */
 
-#rope-track {
-  position: relative; flex: 1; height: 12px; border-radius: 6px;
+.rope-segment {
+  width: clamp(28px, 6vw, 52px); height: 10px; border-radius: 6px; flex-shrink: 0;
   background: repeating-linear-gradient(45deg, #8a6a3f 0 6px, #6b4f2e 6px 12px);
   box-shadow: inset 0 0 0 1px rgba(0,0,0,0.3);
 }
-.rope-tick {
-  position: absolute; top: -6px; width: 2px; height: 24px; background: rgba(255,255,255,0.18);
-  transform: translateX(-1px);
-}
-#rope-knot {
-  position: absolute; top: 50%; font-size: 1.5rem; left: 50%;
-  transform: translate(-50%, -50%);
-  transition: left 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+#rope-flag {
+  flex-shrink: 0; font-size: clamp(1.1rem, 3vw, 1.5rem);
   filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
 }
 

@@ -1,0 +1,37 @@
+name: Push question stats back to Notion
+
+on:
+  schedule:
+    - cron: '15 * * * *' # 跟 deploy.yml 的拉取同步（整點）錯開 15 分鐘，避免同時打 Notion API
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: push-notion-stats
+  cancel-in-progress: false
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # 先確保 students.json 是最新的，才知道現在有哪些學生/題目要去 Firestore 對應查詢
+      - run: node scripts/sync-notion.mjs
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_STUDENTS_DB_ID: ${{ secrets.NOTION_STUDENTS_DB_ID }}
+
+      # 讀 Firestore（SnakeG + tug-of-war 兩邊記錄的作答次數）合併後推回 Notion Question 表
+      - run: node scripts/push-notion-stats.mjs
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}

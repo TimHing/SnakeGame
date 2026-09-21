@@ -23,6 +23,9 @@ function getRichText(prop) {
 function getSelectName(prop) {
   return prop?.select?.name;
 }
+function getNumber(prop) {
+  return typeof prop?.number === 'number' ? prop.number : null;
+}
 function getUrlOrText(prop) {
   if (!prop) return '';
   if (prop.type === 'url') return prop.url || '';
@@ -85,6 +88,7 @@ async function syncStudents(notion, studentsDbId) {
     const dbRaw = getUrlOrText(page.properties['Questions DB']);
     const questionsDbId = extractDatabaseId(dbRaw);
     const pin = getRichText(page.properties.PIN);
+    const order = getNumber(page.properties['順序']);
 
     if (!name) fail('學生列缺少 Name（標題欄）', page);
     if (!questionsDbId) fail(`學生「${name}」的 Questions DB 欄位看不出有效的 Notion 資料庫網址/ID`, page);
@@ -93,10 +97,15 @@ async function syncStudents(notion, studentsDbId) {
     // eslint-disable-next-line no-await-in-loop
     const questions = await syncStudentQuestions(notion, questionsDbId, `學生「${name}」`);
     students.push({
-      id: page.id, name, pin: pin || null, questions,
+      id: page.id, name, pin: pin || null, questions, _order: order,
     });
   }
-  return students;
+
+  // Notion API 本身沒有辦法讀到使用者在畫面上手動拖拽排列的順序（已知限制），
+  // 所以改用「順序」這個數字欄位當唯一可靠的排序依據，讓網站上的名字順序能跟老師在 Notion 裡排的一致。
+  // 還沒填「順序」的新學生（order 是 null）一律排到最後面，不會擋住同步。
+  students.sort((a, b) => (a._order ?? Infinity) - (b._order ?? Infinity));
+  return students.map(({ _order, ...student }) => student);
 }
 
 async function main() {

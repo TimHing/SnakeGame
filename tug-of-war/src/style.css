@@ -1,4 +1,8 @@
 * { box-sizing: border-box; }
+/* 依螢幕尺寸等比放大整個介面：iPad（約 1024×768）維持 16px 基準，
+   65 吋 16:9 觸控屏（1920×1080 以上）依寬高較小者等比放大，所有尺寸都用 rem 跟著走。 */
+html { font-size: clamp(16px, min(1.5625vw, 2.7778vh), 400px); -webkit-text-size-adjust: 100%; }
+body { touch-action: manipulation; }
 body {
   margin: 0;
   font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans TC', sans-serif;
@@ -11,7 +15,7 @@ body {
 .view { min-height: 100vh; }
 
 button {
-  font-size: 1rem; border-radius: 8px; cursor: pointer; background: #4c8bf5; color: #fff;
+  font-size: 1rem; border-radius: 0.5rem; cursor: pointer; background: #4c8bf5; color: #fff;
   border: none; font-weight: 700; padding: 0.6rem 1rem;
 }
 button:hover { background: #3a72d6; }
@@ -22,8 +26,8 @@ button.secondary:hover { background: #4a5474; }
 /* 賽前設定：時長選擇 + 排行榜 */
 #duration-view { display: flex; align-items: center; justify-content: center; }
 .login-box {
-  background: #262c3d; padding: 2.5rem; border-radius: 16px; width: min(420px, 92vw); text-align: center;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  background: #262c3d; padding: 2.5rem; border-radius: 1rem; width: min(26.25rem, 92vw); text-align: center;
+  box-shadow: 0 0.5rem 1.875rem rgba(0,0,0,0.35);
 }
 .login-box h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
 .login-box > button { margin-top: 1.25rem; width: 100%; }
@@ -32,7 +36,7 @@ button.secondary:hover { background: #4a5474; }
   display: flex; align-items: center; justify-content: center; gap: 1rem; margin: 1.5rem 0 0;
 }
 .duration-control span { font-size: 1.4rem; font-weight: 700; min-width: 6ch; }
-.duration-control button { width: 44px; height: 44px; padding: 0; font-size: 1.3rem; }
+.duration-control button { width: 2.75rem; height: 2.75rem; padding: 0; font-size: 1.3rem; }
 
 .tow-leaderboard { margin-top: 2rem; text-align: left; }
 .tow-leaderboard h3 {
@@ -46,8 +50,8 @@ button.secondary:hover { background: #4a5474; }
 /* 選手選擇（左右分區） */
 #picker-view { display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
 .picker-box {
-  background: #262c3d; padding: 2rem; border-radius: 16px; width: min(760px, 96vw); text-align: center;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  background: #262c3d; padding: 2rem; border-radius: 1rem; width: min(47.5rem, 96vw); text-align: center;
+  box-shadow: 0 0.5rem 1.875rem rgba(0,0,0,0.35);
 }
 .picker-box h1 { margin: 0 0 1rem; }
 .picker-box > button { margin-top: 1.25rem; width: 100%; }
@@ -56,22 +60,22 @@ button.secondary:hover { background: #4a5474; }
 
 .avatar-picker { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.9rem; }
 .avatar-select {
-  flex: 1; font-size: 0.9rem; padding: 0.5rem 0.6rem; border-radius: 8px; border: 1px solid #444b5e;
+  flex: 1; font-size: 0.9rem; padding: 0.5rem 0.6rem; border-radius: 0.5rem; border: 1px solid #444b5e;
   background: #1b1f2a; color: #fff;
 }
 .avatar-preview {
-  width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+  width: 2.5rem; height: 2.5rem; border-radius: 50%; object-fit: cover; flex-shrink: 0;
   background: #1b1f2a; border: 2px solid #4c8bf5;
 }
 
 .rollcall-list {
   display: flex; flex-direction: column; gap: 0.5rem;
-  max-height: 320px; overflow-y: auto;
+  max-height: 20rem; overflow-y: auto;
 }
 .rollcall-item { display: flex; flex-direction: column; gap: 0.4rem; }
 .rollcall-pin { display: flex; gap: 0.4rem; align-items: center; }
 .rollcall-pin input {
-  flex: 1; font-size: 1rem; padding: 0.5rem 0.6rem; border-radius: 8px; border: 1px solid #444b5e;
+  flex: 1; font-size: 1rem; padding: 0.5rem 0.6rem; border-radius: 0.5rem; border: 1px solid #444b5e;
   background: #1b1f2a; color: #fff;
 }
 .error { color: #ff6b6b; font-size: 0.85rem; min-height: 1.2em; margin: 0; text-align: left; }
@@ -85,8 +89,8 @@ button.secondary:hover { background: #4a5474; }
 /* 外層固定寬度、overflow:hidden 當「畫面框」；輸的一方連人帶繩被拖到框外時就直接被裁掉不顯示，
    這正是要營造的緊張感——越接近秒殺，被拉贏那一方自己的隊員（甚至頭像）會愈來愈常被拖出畫面。 */
 #rope-viewport {
-  width: min(560px, 96vw); overflow: hidden;
-  background: #10131a; border-radius: 16px; padding: 1rem clamp(0.5rem, 3vw, 1.25rem);
+  width: min(35rem, 96vw); overflow: hidden;
+  background: #10131a; border-radius: 1rem; padding: 1rem clamp(0.5rem, 3vw, 1.25rem);
   box-shadow: inset 0 0 0 1px #2a3040;
   display: flex; justify-content: center;
 }
@@ -94,13 +98,13 @@ button.secondary:hover { background: #4a5474; }
 /* 整條「拔河隊伍」：兩邊各兩個小隊員 + 主頭像，中間隔一小段繩子空隙、紅旗。
    每次得分，整條隊伍一起平移（--pan-pct，相對自己寬度的百分比，響應式不受螢幕大小影響）。 */
 #rope-train {
-  display: flex; align-items: center; gap: clamp(4px, 1.5vw, 8px); flex-shrink: 0;
+  display: flex; align-items: center; gap: clamp(0.25rem, 1.5vw, 0.5rem); flex-shrink: 0;
   transform: translateX(calc(var(--pan-pct, 0) * 1%));
   transition: transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .rope-mate {
-  width: clamp(24px, 6vw, 36px); height: clamp(24px, 6vw, 36px); border-radius: 50%;
+  width: clamp(1.5rem, 6vw, 2.25rem); height: clamp(1.5rem, 6vw, 2.25rem); border-radius: 50%;
   display: flex; align-items: center; justify-content: center; font-size: clamp(0.8rem, 2.2vw, 1.1rem);
   background: #262c3d; border: 2px solid #3a4257; flex-shrink: 0; opacity: 0.85;
 }
@@ -108,7 +112,7 @@ button.secondary:hover { background: #4a5474; }
 /* 選手選擇畫面挑的寶可夢頭像，直接當這位選手在拔河繩上「帶隊拉繩的角色」；
    沒選頭像的話退回顯示名字的第一個字，一樣圈成頭像的樣子。 */
 .rope-avatar {
-  width: clamp(44px, 10vw, 60px); height: clamp(44px, 10vw, 60px); border-radius: 50%;
+  width: clamp(2.75rem, 10vw, 3.75rem); height: clamp(2.75rem, 10vw, 3.75rem); border-radius: 50%;
   flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center;
   font-size: 1.2rem; font-weight: 800; background: #262c3d; border: 3px solid #4c8bf5;
   transition: transform 220ms ease;
@@ -118,8 +122,8 @@ button.secondary:hover { background: #4a5474; }
 .rope-avatar-right span { transform: scaleX(-1); } /* 但退回顯示的名字縮寫要翻回正常方向，不然會變成鏡像字 */
 
 .rope-segment {
-  width: clamp(28px, 6vw, 52px); height: 10px; border-radius: 6px; flex-shrink: 0;
-  background: repeating-linear-gradient(45deg, #8a6a3f 0 6px, #6b4f2e 6px 12px);
+  width: clamp(1.75rem, 6vw, 3.25rem); height: 0.625rem; border-radius: 0.375rem; flex-shrink: 0;
+  background: repeating-linear-gradient(45deg, #8a6a3f 0 0.375rem, #6b4f2e 0.375rem 0.75rem);
   box-shadow: inset 0 0 0 1px rgba(0,0,0,0.3);
 }
 #rope-flag {
@@ -143,41 +147,41 @@ button.secondary:hover { background: #4a5474; }
 .match-panels { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; min-height: 0; }
 .panel {
   position: relative;
-  background: #262c3d; border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column;
+  background: #262c3d; border-radius: 1rem; padding: 1.5rem; display: flex; flex-direction: column;
   align-items: center; text-align: center; gap: 0.5rem;
 }
 @keyframes panel-flash-correct {
   0% { box-shadow: inset 0 0 0 0 rgba(47, 158, 87, 0.6); }
-  100% { box-shadow: inset 0 0 0 10px rgba(47, 158, 87, 0); }
+  100% { box-shadow: inset 0 0 0 0.625rem rgba(47, 158, 87, 0); }
 }
 @keyframes panel-flash-wrong {
   0% { box-shadow: inset 0 0 0 0 rgba(217, 70, 60, 0.6); }
-  100% { box-shadow: inset 0 0 0 10px rgba(217, 70, 60, 0); }
+  100% { box-shadow: inset 0 0 0 0.625rem rgba(217, 70, 60, 0); }
 }
 .panel-pulse-correct { animation: panel-flash-correct 550ms ease-out; }
 .panel-pulse-wrong { animation: panel-flash-wrong 550ms ease-out; }
 
 .score-pop {
-  position: absolute; top: 12px; left: 50%; font-size: 1.4rem; font-weight: 800;
+  position: absolute; top: 0.75rem; left: 50%; font-size: 1.4rem; font-weight: 800;
   pointer-events: none; z-index: 5;
   animation: score-pop-float 750ms ease-out forwards;
 }
 .score-pop-correct { color: #4ade80; }
 .score-pop-wrong { color: #ff6b6b; }
 @keyframes score-pop-float {
-  0% { opacity: 0; transform: translate(-50%, 8px) scale(0.7); }
-  30% { opacity: 1; transform: translate(-50%, -8px) scale(1.2); }
-  100% { opacity: 0; transform: translate(-50%, -36px) scale(1); }
+  0% { opacity: 0; transform: translate(-50%, 0.5rem) scale(0.7); }
+  30% { opacity: 1; transform: translate(-50%, -0.5rem) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -2.25rem) scale(1); }
 }
 .panel-avatar {
-  width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+  width: 4rem; height: 4rem; border-radius: 50%; object-fit: cover;
   border: 3px solid #4c8bf5; background: #1b1f2a;
 }
 /* 比賽結束時，贏方的面板持續發光慶祝，直到下一局開始才清掉 */
 .panel-winner { animation: panel-winner-glow 1.1s ease-in-out infinite alternate; }
 @keyframes panel-winner-glow {
-  from { box-shadow: 0 0 0 3px #ffd166, 0 0 16px 4px rgba(255, 209, 102, 0.5); }
-  to { box-shadow: 0 0 0 3px #ffd166, 0 0 30px 10px rgba(255, 209, 102, 0.85); }
+  from { box-shadow: 0 0 0 3px #ffd166, 0 0 1rem 0.25rem rgba(255, 209, 102, 0.5); }
+  to { box-shadow: 0 0 0 3px #ffd166, 0 0 1.875rem 0.625rem rgba(255, 209, 102, 0.85); }
 }
 .panel-name { font-size: 1.2rem; font-weight: 700; }
 .panel-score { color: #9aa3b2; font-size: 0.9rem; }
@@ -214,7 +218,7 @@ button.secondary:hover { background: #4a5474; }
 /* 贏家慶祝：滿版彩帶紙屑，只在有人贏（不是平手）時才灑出來 */
 #confetti-layer { position: fixed; inset: 0; z-index: 70; pointer-events: none; overflow: hidden; }
 .confetti-piece {
-  position: absolute; top: -20px; width: 8px; height: 14px; opacity: 0.9; border-radius: 2px;
+  position: absolute; top: -1.25rem; width: 0.5rem; height: 0.875rem; opacity: 0.9; border-radius: 2px;
   animation-name: confetti-fall; animation-timing-function: ease-in; animation-fill-mode: forwards;
 }
 @keyframes confetti-fall {

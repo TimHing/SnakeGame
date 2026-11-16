@@ -39,7 +39,8 @@ button:hover { background: #3a72d6; }
 button.secondary { background: #3a4257; }
 button.secondary:hover { background: #4a5474; }
 
-#game-view { min-height: 100vh; display: flex; flex-direction: column; }
+/* 遊戲畫面固定為一個螢幕高（不是 min-height），地圖才會縮放到完整落在螢幕內，不被擠出畫面下方 */
+#game-view { height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
 #hud {
   display: flex; align-items: center; gap: 1rem; padding: 0.6rem 1rem; background: #12151d;
   border-bottom: 1px solid #2a3040;
@@ -65,6 +66,7 @@ button.secondary:hover { background: #4a5474; }
 
 /* 窄螢幕（手機）：排行榜移到遊戲畫面下方，不再跟畫布搶寬度 */
 @media (max-width: 720px) {
+  #game-view { height: auto; min-height: 100vh; overflow: visible; }
   #game-body { flex-direction: column; }
   #phaser-container { flex: 0 0 auto; width: 100%; aspect-ratio: 3 / 2; }
   #leaderboard {
